@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import DeckGL from '@deck.gl/react';
 import { ScatterplotLayer, LineLayer } from '@deck.gl/layers';
 import { HeatmapLayer } from '@deck.gl/aggregation-layers';
-import Map from 'react-map-gl';
+import Map from 'react-map-gl/maplibre';
 import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { ProcessedData } from '@/lib/processData';
