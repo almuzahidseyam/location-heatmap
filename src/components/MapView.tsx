@@ -90,7 +90,7 @@ export default function MapView({ data, theme, focusLocation }: MapViewProps) {
     <DeckGL
       id="deckgl-map"
       viewState={viewState}
-      onViewStateChange={({ viewState }) => setViewState(viewState)}
+      onViewStateChange={({ viewState }) => setViewState(viewState as any)}) => setViewState(viewState)}
       controller={true}
       layers={layers}
       getTooltip={({object}) => {
@@ -98,7 +98,7 @@ export default function MapView({ data, theme, focusLocation }: MapViewProps) {
         if (object.visits) return `${object.name !== 'Unnamed' ? object.name : 'Unknown Place'} \nVisits: ${object.visits} \nHours: ${Math.round(object.durationHours)}`;
         return `Route (${object.frequency} trips)`;
       }}
-      glOptions={{ preserveDrawingBuffer: true }}
+      {...({ glOptions: { preserveDrawingBuffer: true } } as any)}}
     >
       <Map
         mapLib={maplibregl as any}

@@ -19,10 +19,12 @@ export interface RouteSegment {
   endLng: number;
   activityType: string;
   path: [number, number][]; // [lng, lat]
-  frequency: number; // Added for route coloring
+  frequency: number;
+  distance?: number; // Added for route coloring
 }
 
 export interface TopPlace {
+  name: string;
   key: string;
   lat: number;
   lng: number;
@@ -148,7 +150,7 @@ export async function parseFile(file: File, onProgress: (msg: string) => void): 
 
 // Generate Synthetic Demo Data
 export function generateDemoData(): ParsedData {
-  const hubs = [[23.7806, 90.4000, 'Home'], [23.7509, 90.3935, 'Work'], [23.7340, 90.3926, 'University'], [23.8103, 90.4125, 'Gym']];
+  const hubs: [number, number, string][] = [[23.7806, 90.4000, 'Home'], [23.7509, 90.3935, 'Work'], [23.7340, 90.3926, 'University'], [23.8103, 90.4125, 'Gym']];
   const rnd = (a: number, b: number) => a + Math.random() * (b - a);
   const V: PlaceVisit[] = [];
   const P: RouteSegment[] = [];

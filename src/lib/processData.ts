@@ -69,7 +69,7 @@ export function processData(
     }
   });
 
-  topPlaces.sort((a, b) => b.n - a.n);
+  topPlaces.sort((a, b) => b.visits - a.visits);
 
   // Group routes for frequency coloring
   const routeMap = new Map<string, RouteSegment>();
