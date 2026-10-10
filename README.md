@@ -1,6 +1,29 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Timeline Heatmap 🌍
 
-## Getting Started
+A 100% client-side, privacy-focused visualizer for your Google Location History (Timeline). Built with Next.js, Deck.gl, and MapLibre.
+
+![Timeline Heatmap Banner](https://img.shields.io/badge/Status-Active-brightgreen) ![License](https://img.shields.io/badge/License-MIT-blue.svg) ![Open Source](https://img.shields.io/badge/Open_Source-%E2%9D%A4-red.svg)
+
+## ✨ Features
+
+- **100% Privacy Focused:** Files are processed entirely inside your browser. No data is ever uploaded to a server.
+- **Multiple Formats Supported:** 
+  - Raw `Records.json`
+  - Semantic Location History JSONs
+  - iOS & Android on-device exports
+  - Full `.zip` file from Google Takeout (drag and drop the whole ZIP!)
+- **Advanced Visualizations:** 
+  - Heatmap layers for visits
+  - Frequency-colored path lines for routes
+  - Dynamic clustering and size-scaling for popular places
+- **Interactive Dashboard:** 
+  - Click any "Top Place" to fly to it on the map
+  - Edit place names and save them locally in your browser
+  - Bar charts for Weekly & Hourly arrival patterns
+- **Export:** Save your generated beautiful map as a high-quality image (`.png`).
+- **Dark & Light Mode:** Seamlessly switch between themes.
+
+## 🚀 Getting Started
 
 First, run the development server:
 
@@ -16,21 +39,26 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📦 How to Use with Your Data
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Go to [Google Takeout](https://takeout.google.com/).
+2. Deselect all, and select only **Location History (Timeline)**.
+3. Export and download the `.zip` file.
+4. Drag and drop the downloaded `.zip` file directly into the application! 
 
-## Learn More
+Alternatively, if you have a standalone `.json` timeline export, you can drop that directly too.
 
-To learn more about Next.js, take a look at the following resources:
+## 🛠 Tech Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Framework:** [Next.js](https://nextjs.org/) (App Router)
+- **Map Renderer:** [Deck.gl](https://deck.gl/) (WebGL-powered)
+- **Base Map:** [MapLibre GL JS](https://maplibre.org/)
+- **Charts:** [Recharts](https://recharts.org/)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📄 License
 
-## Deploy on Vercel
+This project is open-source and available under the [MIT License](LICENSE).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+*Created by [Muhammad Al-Muzahid](https://github.com/almuzahidseyam).*
