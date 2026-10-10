@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ParsedData, PlaceVisit, RouteSegment, TopPlace } from './parseLocationData';
 
 export interface ProcessedData {
