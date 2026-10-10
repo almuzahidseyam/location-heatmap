@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { parseFile, ParsedData, generateDemoData } from "@/lib/parseLocationData";
 import { processData, ProcessedData } from "@/lib/processData";
-import MapView from "@/components/MapView";
+import dynamic from "next/dynamic";
+const MapView = dynamic(() => import("@/components/MapView"), { ssr: false });
 import { BarChart, Bar, XAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
 import { Sun, Moon, Map as MapIcon, Edit2, Camera } from "lucide-react";
 
@@ -82,10 +83,10 @@ export default function Home() {
   };
 
   return (
-    <div className={`flex h-screen w-full overflow-hidden font-sans transition-colors duration-300 ${theme === 'dark' ? 'bg-slate-900 text-slate-200' : 'bg-gray-50 text-slate-800'}`}>
+    <div className={`flex flex-col md:flex-row h-screen w-full overflow-hidden font-sans transition-colors duration-300 ${theme === 'dark' ? 'bg-slate-900 text-slate-200' : 'bg-gray-50 text-slate-800'}`}>
       
       {/* Sidebar */}
-      <div className={`w-80 h-full shadow-2xl flex flex-col z-10 overflow-hidden ${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-200'} border-r`}>
+      <div className={`w-full md:w-96 h-[45%] md:h-full shadow-2xl flex flex-col z-10 overflow-hidden ${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-200'} border-b md:border-b-0 md:border-r`}>
         <div className="p-5 border-b shrink-0 flex justify-between items-center border-inherit">
           <div>
             <h1 className="text-xl font-bold tracking-tight text-blue-500">Timeline Heatmap</h1>
