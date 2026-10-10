@@ -19,7 +19,13 @@ export interface RouteSegment {
   endLng: number;
   activityType: string;
   distance: number;
-  path: [number, number][]; // [lng, lat] for deck.gl
+  path: [number, number][]; 
+}
+
+export interface TopPlace {
+  name: string;
+  visits: number;
+  hours: number;
 }
 
 export interface ParsedData {
@@ -27,6 +33,11 @@ export interface ParsedData {
   routes: RouteSegment[];
   totalHours: number;
   totalDistance: number;
+  topPlaces: TopPlace[];
+  patterns: {
+    byWeekday: { day: string; count: number }[];
+    byHour: { hour: string; count: number }[];
+  };
 }
 
 export async function parseGoogleTakeoutZip(file: File, onProgress: (msg: string) => void): Promise<ParsedData> {
@@ -34,7 +45,6 @@ export async function parseGoogleTakeoutZip(file: File, onProgress: (msg: string
   const zip = new JSZip();
   const loadedZip = await zip.loadAsync(file);
   
-  // Find all semantic location history JSON files
   const jsonFiles = Object.values(loadedZip.files).filter(
     (zipEntry) => 
       !zipEntry.dir && 
@@ -43,7 +53,7 @@ export async function parseGoogleTakeoutZip(file: File, onProgress: (msg: string
   );
 
   if (jsonFiles.length === 0) {
-    throw new Error("No Semantic Location History JSON files found in the ZIP. Please ensure you exported your 'Location History' or 'Timeline' correctly.");
+    throw new Error("No Semantic Location History JSON files found in the ZIP.");
   }
 
   const places: PlaceVisit[] = [];
@@ -51,10 +61,14 @@ export async function parseGoogleTakeoutZip(file: File, onProgress: (msg: string
   let totalHours = 0;
   let totalDistance = 0;
 
+  const placeAggregator: Record<string, {name: string, visits: number, hours: number}> = {};
+  const weekdayCounts = new Array(7).fill(0);
+  const hourCounts = new Array(24).fill(0);
+
   onProgress(`Found ${jsonFiles.length} months of data. Parsing...`);
 
   for (let i = 0; i < jsonFiles.length; i++) {
-    onProgress(`Parsing month ${i + 1} of ${jsonFiles.length}...`);
+    if (i % 5 === 0) onProgress(`Parsing month ${i + 1} of ${jsonFiles.length}...`);
     const fileContent = await jsonFiles[i].async('string');
     
     try {
@@ -62,7 +76,6 @@ export async function parseGoogleTakeoutZip(file: File, onProgress: (msg: string
       const timelineObjects = data.timelineObjects || [];
 
       for (const obj of timelineObjects) {
-        // Parse Place Visits
         if (obj.placeVisit && obj.placeVisit.location) {
           const loc = obj.placeVisit.location;
           if (loc.latitudeE7 && loc.longitudeE7) {
@@ -82,10 +95,20 @@ export async function parseGoogleTakeoutZip(file: File, onProgress: (msg: string
               endTimestamp: obj.placeVisit.duration?.endTimestamp,
               durationHours
             });
+
+            // Analytics Aggregation
+            const key = loc.name || loc.address || `${Math.round((loc.latitudeE7/1e7)*1000)/1000}`;
+            if (!placeAggregator[key]) {
+              placeAggregator[key] = { name: loc.name || "Unnamed Place", visits: 0, hours: 0 };
+            }
+            placeAggregator[key].visits += 1;
+            placeAggregator[key].hours += durationHours;
+
+            weekdayCounts[start.getDay()] += 1;
+            hourCounts[start.getHours()] += 1;
           }
         }
 
-        // Parse Activity Segments (Routes)
         if (obj.activitySegment) {
           const seg = obj.activitySegment;
           if (seg.startLocation?.latitudeE7 && seg.endLocation?.latitudeE7) {
@@ -97,26 +120,20 @@ export async function parseGoogleTakeoutZip(file: File, onProgress: (msg: string
             const distance = seg.distance || 0;
             totalDistance += distance;
 
-            // Extract path if available
             let path: [number, number][] = [];
             if (seg.simplifiedRawPath?.points) {
               path = seg.simplifiedRawPath.points.map((p: any) => [p.lngE7 / 1e7, p.latE7 / 1e7]);
             } else if (seg.waypointPath?.waypoints) {
               path = seg.waypointPath.waypoints.map((p: any) => [p.lngE7 / 1e7, p.latE7 / 1e7]);
             } else {
-              // Fallback straight line
               path = [[startLng, startLat], [endLng, endLat]];
             }
 
             routes.push({
               id: `${startLat}-${startLng}-${seg.duration?.startTimestamp}`,
-              startLat,
-              startLng,
-              endLat,
-              endLng,
+              startLat, startLng, endLat, endLng,
               activityType: seg.activityType || "UNKNOWN",
-              distance,
-              path
+              distance, path
             });
           }
         }
@@ -126,6 +143,16 @@ export async function parseGoogleTakeoutZip(file: File, onProgress: (msg: string
     }
   }
 
+  // Format Top Places
+  const topPlaces = Object.values(placeAggregator)
+    .sort((a, b) => b.hours - a.hours)
+    .slice(0, 10);
+
+  // Format Patterns
+  const days = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+  const byWeekday = weekdayCounts.map((count, i) => ({ day: days[i], count }));
+  const byHour = hourCounts.map((count, i) => ({ hour: `${i}:00`, count }));
+
   onProgress("Processing complete!");
-  return { places, routes, totalHours, totalDistance };
+  return { places, routes, totalHours, totalDistance, topPlaces, patterns: { byWeekday, byHour } };
 }
